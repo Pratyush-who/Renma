@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renma/core/routes/app_routes.dart';
 import 'package:renma/core/theme/app_colors.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_black_button.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -38,53 +40,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
 
     Navigator.pushReplacementNamed(context, AppRoutes.home);
-  }
-
-  Widget _inputField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2,
-            color: AppColors.black,
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          style: GoogleFonts.inter(fontSize: 16, color: AppColors.black),
-          cursorColor: AppColors.black,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: GoogleFonts.inter(
-              color: AppColors.grey.withOpacity(0.55),
-            ),
-            filled: true,
-            fillColor: AppColors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 18,
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.black, width: 1.2),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.black, width: 2.2),
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _photoCard() {
@@ -291,41 +246,26 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           children: [
                             _photoCard(),
                             const SizedBox(height: 20),
-                            _inputField(
+                            AuthTextField(
                               label: 'USERNAME',
                               controller: _usernameController,
-                              hintText: 'your_name_here',
+                              hint: 'your_name_here',
+                              borderRadius: 0,
                             ),
                             const SizedBox(height: 18),
-                            _inputField(
+                            AuthTextField(
                               label: 'EMAIL',
                               controller: _emailController,
-                              hintText: 'you@example.com',
+                              hint: 'you@example.com',
                               keyboardType: TextInputType.emailAddress,
+                              borderRadius: 0,
                             ),
                             const SizedBox(height: 22),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: _completeProfile,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.black,
-                                  foregroundColor: AppColors.white,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Complete Profile',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.4,
-                                  ),
-                                ),
-                              ),
+                            AuthBlackButton(
+                              title: 'Complete Profile',
+                              iconWidget: const SizedBox.shrink(),
+                              onTap: _completeProfile,
+                              borderRadius: 0,
                             ),
                           ],
                         ),

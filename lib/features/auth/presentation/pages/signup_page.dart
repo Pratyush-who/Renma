@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renma/core/routes/app_routes.dart';
+import '../widgets/auth_black_button.dart';
+import '../widgets/auth_white_button.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_otp_timer.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -21,6 +25,8 @@ class _SignupPageState extends State<SignupPage> {
   ];
   int _currentIndex = 0;
   Timer? _timer;
+  Timer? _resendTimer;
+  int _resendSeconds = 20;
 
   bool _otpRequested = false;
   bool _showPhoneInput = false;
@@ -39,6 +45,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _resendTimer?.cancel();
     _phoneController.dispose();
     _otpController.dispose();
     super.dispose();
@@ -60,8 +67,24 @@ class _SignupPageState extends State<SignupPage> {
     FocusScope.of(context).unfocus();
     setState(() {
       _otpRequested = true;
+      _resendSeconds = 20;
     });
+    _startResendTimer();
     _showMessage('OTP sent to $phoneNumber.');
+  }
+
+  void _startResendTimer() {
+    _resendTimer?.cancel();
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() {
+        if (_resendSeconds > 0) {
+          _resendSeconds--;
+        } else {
+          _resendTimer?.cancel();
+        }
+      });
+    });
   }
 
   void _continue() {
@@ -147,9 +170,9 @@ class _SignupPageState extends State<SignupPage> {
                   RichText(
                     text: TextSpan(
                       text: 'Scroll Less',
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.sora(
                         fontSize: 50,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: Colors.black,
                         height: 1.1,
                         letterSpacing: -0.5,
@@ -157,14 +180,14 @@ class _SignupPageState extends State<SignupPage> {
                       children: [
                         TextSpan(
                           text: '.',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.sora(
                             color: const Color(0xFFB398EB),
                           ),
                         ),
                         const TextSpan(text: '\nKnow More'),
                         TextSpan(
                           text: '.',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.sora(
                             color: const Color(0xFF88E0A0), // Green dot
                           ),
                         ),
@@ -196,7 +219,7 @@ class _SignupPageState extends State<SignupPage> {
                   const SizedBox(height: 48),
 
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
+                    duration: const Duration(milliseconds: 500),
                     transitionBuilder:
                         (Widget child, Animation<double> animation) {
                           final isIncoming =
@@ -204,17 +227,18 @@ class _SignupPageState extends State<SignupPage> {
 
                           return ClipRect(
                             child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: isIncoming
-                                    ? const Offset(1, 0)
-                                    : const Offset(-1, 0),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: animation,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              ),
+                              position:
+                                  Tween<Offset>(
+                                    begin: isIncoming
+                                        ? const Offset(0, 1)
+                                        : const Offset(0, -1),
+                                    end: Offset.zero,
+                                  ).animate(
+                                    CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.linear,
+                                    ),
+                                  ),
                               child: child,
                             ),
                           );
@@ -225,7 +249,7 @@ class _SignupPageState extends State<SignupPage> {
                       children: [
                         Text(
                           _animatedLines[_currentIndex][0],
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.goldman(
                             fontSize: 26,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFFB398EB),
@@ -233,7 +257,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         Text(
                           _animatedLines[_currentIndex][1],
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.goldman(
                             fontSize: 26,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFF88E0A0),
@@ -285,7 +309,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       key: const ValueKey('buttons'),
       children: [
-        _buildBlackButton(
+        AuthBlackButton(
           title: 'Continue with Phone Number',
           iconWidget: const Icon(
             Icons.phone_outlined,
@@ -316,7 +340,7 @@ class _SignupPageState extends State<SignupPage> {
           ],
         ),
         const SizedBox(height: 24),
-        _buildGoogleWhiteButton(
+        AuthWhiteButton(
           title: 'Continue with Google',
           iconWidget: Image.asset('assets/google.webp', height: 22, width: 22),
           onTap: _continueWithGoogle,
@@ -325,88 +349,12 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _buildGoogleWhiteButton({
-    required String title,
-    required Widget iconWidget,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            iconWidget,
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBlackButton({
-    required String title,
-    required Widget iconWidget,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: const Color(
-            0xFF1E1E1E,
-          ), // Deep dark solid black as seen in image
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            iconWidget,
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPhoneInputSection() {
     return Column(
       key: const ValueKey('phone_input'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildTextField(
+        AuthTextField(
           controller: _phoneController,
           hint: 'Enter your phone number',
           icon: Icons.phone_outlined,
@@ -415,15 +363,16 @@ class _SignupPageState extends State<SignupPage> {
         ),
         const SizedBox(height: 16),
         if (_otpRequested) ...[
-          _buildTextField(
+          AuthTextField(
             controller: _otpController,
             hint: 'Enter OTP',
             icon: Icons.lock_outline,
             keyboardType: TextInputType.number,
           ),
+          AuthOtpTimer(resendSeconds: _resendSeconds, onResend: _sendOtp),
           const SizedBox(height: 16),
         ],
-        _buildBlackButton(
+        AuthBlackButton(
           title: _otpRequested ? 'Continue' : 'Get OTP',
           iconWidget: const Icon(
             Icons.arrow_forward,
@@ -438,6 +387,7 @@ class _SignupPageState extends State<SignupPage> {
             setState(() {
               _showPhoneInput = false;
               _otpRequested = false;
+              _resendTimer?.cancel();
             });
           },
           child: Text(
@@ -446,41 +396,6 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    required TextInputType keyboardType,
-    bool enabled = true,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      enabled: enabled,
-      style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: GoogleFonts.inter(color: Colors.grey.shade400),
-        prefixIcon: Icon(icon, color: Colors.grey.shade500, size: 20),
-        filled: true,
-        fillColor: enabled ? Colors.white : Colors.grey.shade50,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.black, width: 1.5),
-        ),
-      ),
     );
   }
 }
