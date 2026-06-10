@@ -31,14 +31,14 @@ class _SplashPageState extends State<SplashPage>
       curve: Curves.easeOut,
     );
     _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(
           CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
         );
 
     _controller.forward();
     _timer = Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.signup);
+      Navigator.pushReplacementNamed(context, AppRoutes.intro);
     });
   }
 
@@ -52,69 +52,54 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           Positioned.fill(
-            child: Opacity(
-              opacity: 0.15,
-              child: Image.asset(
-                'assets/auth_bg.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-              ),
+            child: Image.asset(
+              'assets/intro-bg.png',
+              fit: BoxFit.cover,
             ),
           ),
           Positioned.fill(
-            child: DecoratedBox(
+            child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    const Color(0xFFFAFAFA).withOpacity(0.45),
-                    const Color(0xFFFAFAFA).withOpacity(0.92),
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.5),
                   ],
                 ),
               ),
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Center(
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Spacer(),
                       Image.asset(
                         'assets/logo_full.png',
-                        height: 396,
-                        width: 396,
+                        height: 200,
+                        width: 200,
+                        color: Colors.white,
                       ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          width: 56,
-                          height: 2,
-                          color: const Color(0xFFB398EB),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       Text(
-                        'Swipe right on knowledge :)',
-                        textAlign: TextAlign.center,
+                        'RENMA',
                         style: GoogleFonts.inter(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                          height: 1.4,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 10,
+                          color: Colors.white,
                         ),
                       ),
-                      const Spacer(),
                     ],
                   ),
                 ),

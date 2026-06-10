@@ -18,10 +18,19 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
 
-  List<List<String>> get _animatedLines => const [
-    ['Real News.', 'Real Impact.'],
-    ['Quick Briefs.', 'Deep Insights.'],
-    ['Swipe News.', 'Get Informed.'],
+  final List<String> _greetings = const [
+    'Hello',
+    'Namaste',
+    'Hola',
+    'Bonjour',
+    'Ciao',
+    'Hallo',
+    'Привет',
+    '你好',
+    'こんにちは',
+    '안녕하세요',
+    'Merhaba',
+    'Olá',
   ];
   int _currentIndex = 0;
   Timer? _timer;
@@ -34,10 +43,10 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
-        _currentIndex = (_currentIndex + 1) % _animatedLines.length;
+        _currentIndex = (_currentIndex + 1) % _greetings.length;
       });
     });
   }
@@ -108,17 +117,32 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           // Background Image
           Positioned.fill(
             child: Opacity(
-              opacity: 0.15,
+              opacity: 0.4,
               child: Image.asset(
                 'assets/auth_bg.png',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => const SizedBox(),
+              ),
+            ),
+          ),
+          
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withOpacity(0.8),
+                    Colors.white.withOpacity(0.95),
+                  ],
+                ),
               ),
             ),
           ),
@@ -129,53 +153,86 @@ class _SignupPageState extends State<SignupPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 42),
+                  const SizedBox(height: 32),
 
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          width: 1.5,
-                          color: const Color(0xFFB398EB), // purple line
-                        ),
-                        const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/logo_favicon.png',
-                              height: 56,
-                              width: 56,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                            'assets/logo_favicon.png',
+                            height: 48,
+                            width: 48,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'RENMA',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 4.0,
+                              color: Colors.black54,
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'RENMA',
+                          ),
+                        ],
+                      ),
+                      
+                      // Vertical Greeting Flip
+                      Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB398EB).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFB398EB).withOpacity(0.2),
+                          ),
+                        ),
+                        child: Center(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return ClipRect(
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0, 1),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              _greetings[_currentIndex],
+                              key: ValueKey<String>(_greetings[_currentIndex]),
                               style: GoogleFonts.inter(
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                letterSpacing: 5.0,
-                                color: Colors.black87,
+                                color: const Color(0xFFB398EB),
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
 
                   // The Main Headline
                   RichText(
                     text: TextSpan(
-                      text: 'Scroll Less',
+                      text: 'Welcome',
                       style: GoogleFonts.sora(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 42,
+                        fontWeight: FontWeight.w700,
                         color: Colors.black,
                         height: 1.1,
-                        letterSpacing: -0.5,
                       ),
                       children: [
                         TextSpan(
@@ -184,104 +241,26 @@ class _SignupPageState extends State<SignupPage> {
                             color: const Color(0xFFB398EB),
                           ),
                         ),
-                        const TextSpan(text: '\nKnow More'),
+                        const TextSpan(text: '\nLet\'s Get Started'),
                         TextSpan(
                           text: '.',
                           style: GoogleFonts.sora(
-                            color: const Color(0xFF88E0A0), // Green dot
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: 56,
-                      height: 2,
-                      color: const Color(0xFFB398EB),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Subtitle
-                  Text(
-                    'Your swipes may not get you matches,\nbut they can get you knowledge.',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w400,
-                      height: 1.4,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                          final isIncoming =
-                              child.key == ValueKey<int>(_currentIndex);
-
-                          return ClipRect(
-                            child: SlideTransition(
-                              position:
-                                  Tween<Offset>(
-                                    begin: isIncoming
-                                        ? const Offset(0, 1)
-                                        : const Offset(0, -1),
-                                    end: Offset.zero,
-                                  ).animate(
-                                    CurvedAnimation(
-                                      parent: animation,
-                                      curve: Curves.linear,
-                                    ),
-                                  ),
-                              child: child,
-                            ),
-                          );
-                        },
-                    child: Column(
-                      key: ValueKey<int>(_currentIndex),
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          _animatedLines[_currentIndex][0],
-                          style: GoogleFonts.goldman(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFFB398EB),
-                          ),
-                        ),
-                        Text(
-                          _animatedLines[_currentIndex][1],
-                          style: GoogleFonts.goldman(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
                             color: const Color(0xFF88E0A0),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  
                   const SizedBox(height: 16),
-                  Row(
-                    children: List.generate(_animatedLines.length, (index) {
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.only(right: 6),
-                        height: 6,
-                        width: 6,
-                        decoration: BoxDecoration(
-                          color: _currentIndex == index
-                              ? const Color(0xFFB398EB)
-                              : Colors.grey.shade300,
-                          shape: BoxShape.circle,
-                        ),
-                      );
-                    }),
+                  Text(
+                    'Stay ahead of the curve with bite-sized news curated just for you.',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
                   ),
 
                   const Spacer(),
@@ -293,9 +272,7 @@ class _SignupPageState extends State<SignupPage> {
                         : _buildInitialButtons(),
                   ),
 
-                  const SizedBox(height: 24),
-
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
